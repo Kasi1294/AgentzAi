@@ -8,7 +8,8 @@ export default function SearchDetail() {
   return (
     <TextField
       fullWidth
-      label="With normal TextField"
+      label="Apartment Detail"
+      inputProps={{ maxLength: 3 }}
       InputProps={{
         endAdornment: (
           <InputAdornment>
