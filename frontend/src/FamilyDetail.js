@@ -53,7 +53,7 @@ export default function FamilyDetail() {
   const [age, setAge] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [relationshipToHead, setRelationshipToHead] = React.useState("");
-  const [rowData, setRowData] = React.useState([{}]);
+  const [rowData, setRowData] = React.useState("");
   
   
 
@@ -68,17 +68,16 @@ export default function FamilyDetail() {
   async function saveButtonClick(){
     const url = "http://127.0.0.1:8000/home";
     const payLoad = { 
-      method: 'put',
+      method: 'post',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-         body: JSON.stringify({name: "John", age: 31, city: "New York"})
+         body: JSON.stringify(rowData)
     }
     
-      fetch(url, payLoad).then(response => {
-              console.log(JSON.stringify(response))
-      });
+      fetch(url, payLoad)
+        .then(response => {console.log(response)});
   }
 
   const okButtonClick = () => {
