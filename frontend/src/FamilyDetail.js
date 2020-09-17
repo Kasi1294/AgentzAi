@@ -11,7 +11,10 @@ import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
 import "./FamilyDetails.css";
 import DetailGrid from "./DetailGrid";
+import SearchDetail from "./SearchDetail";
 import Button from "@material-ui/core/Button";
+import AddIcon from "@material-ui/icons/Add";
+import SaveIcon from "@material-ui/icons/Save";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,6 +33,9 @@ const useStyles = makeStyles((theme) => ({
   fieldSpace: {
     padding: "16px 8px 16px 8px",
   },
+  searchSpace: {
+    padding: "16px 8px 0px 8px",
+  },
   okButton: {
     color: "#181d1f",
     border: "1px solid #999",
@@ -41,6 +47,12 @@ const useStyles = makeStyles((theme) => ({
       border: "red solid 2px",
     },
   },
+  multiSelect:{
+    minWidth: 201
+  },
+  apartmentNumber:{
+    minWidth: 201
+  }
 }));
 
 export default function FamilyDetail() {
@@ -53,9 +65,8 @@ export default function FamilyDetail() {
   const [age, setAge] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [relationshipToHead, setRelationshipToHead] = React.useState("");
-  const [rowData, setRowData] = React.useState([{}]);
-  
-  
+  const [rowData, setRowData] = React.useState("");
+  const [saveBtnDisabled, setSaveBtnDisabled] = React.useState(true);
 
   const genderChange = (event) => {
     setGender(event.target.value);
@@ -65,23 +76,26 @@ export default function FamilyDetail() {
     setRelationshipToHead(event.target.value);
   };
 
-  async function saveButtonClick(){
+  function saveButtonClick() {
     const url = "http://127.0.0.1:8000/home";
-    const payLoad = { 
-      method: 'put',
+    const payLoad = {
+      method: "post",
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-         body: JSON.stringify({name: "John", age: 31, city: "New York"})
-    }
-    
-      fetch(url, payLoad).then(response => {
-              console.log(JSON.stringify(response))
+      body: JSON.stringify(rowData),
+    };
+
+    fetch(url, payLoad)
+      .then((response) => response.text())
+      .then((data) => {
+        console.log(data);
+        setSaveBtnDisabled(true);
       });
   }
 
-  const okButtonClick = () => {
+  const addButtonClick = () => {
     let gridData = {};
     gridData.familyName = familyName;
     gridData.phoneNumber = phoneNumber;
@@ -93,18 +107,36 @@ export default function FamilyDetail() {
     gridData.gender = gender;
     gridData.relationshipToHead = relationshipToHead;
     setRowData([gridData, ...rowData]);
+    setInitialState();
+    setSaveBtnDisabled(false);
   };
 
-
-  const deleteData = rowIndex => {
-    rowData.splice(rowIndex, 1)
-    setRowData([...rowData])
+  function setInitialState() {
+    setFamilyName("");
+    setPhoneNumber("");
+    setBlock("");
+    setApartmentNumber("");
+    setName("");
+    setAge("");
+    setGender("");
+    setRelationshipToHead("");
   }
 
-  const editData = (rowIndex, updatedData) => setRowData(rowData[rowIndex] = updatedData)
-  
+  const deleteData = (rowIndex) => {
+    rowData.splice(rowIndex, 1);
+    setRowData([...rowData]);
+  };
+
+  const editData = (rowIndex, updatedData) =>
+    setRowData((rowData[rowIndex] = updatedData));
+
   return (
     <div>
+      <Container fixed={true} maxWidth={"md"} className={classes.searchSpace}>
+        <Paper elevation={1} className={classes.fieldSpace}>
+          <SearchDetail />
+        </Paper>
+      </Container>
       <Container fixed={true} maxWidth={"md"} className={classes.container}>
         <Paper elevation={2}>
           <Typography variant="h6" align="center">
@@ -151,7 +183,7 @@ export default function FamilyDetail() {
                 onChange={(value) => setBlock(value.target.value)}
               />
             </Grid>
-            <Grid item sm={3} className={classes.fieldSpace}>
+            <Grid item sm={3} className={classes.fieldSpace + " " + classes.apartmentNumber}>
               <TextField
                 fullWidth
                 type="number"
@@ -173,6 +205,7 @@ export default function FamilyDetail() {
               />
             </Grid>
           </Grid>
+          <br />
           <Typography variant="h6" align="center">
             Family Details
           </Typography>
@@ -205,7 +238,7 @@ export default function FamilyDetail() {
               />
             </Grid>
             <Grid item sm={3} className={classes.fieldSpace}>
-              <FormControl fullWidth>
+              <FormControl fullWidth className={classes.multiSelect}>
                 <InputLabel id="Gender"> Gender </InputLabel>
                 <Select
                   labelId="Gender"
@@ -219,7 +252,7 @@ export default function FamilyDetail() {
               </FormControl>
             </Grid>
             <Grid item sm={3} className={classes.fieldSpace}>
-              <FormControl fullWidth>
+              <FormControl fullWidth className={classes.multiSelect}>
                 <InputLabel id="relationship">Relationship To Head</InputLabel>
                 <Select
                   labelId="relationship"
@@ -236,24 +269,27 @@ export default function FamilyDetail() {
               </FormControl>
             </Grid>
           </Grid>
-          <Grid align="center">
+          <Grid item className={classes.fieldSpace} align="center">
             <Button
+              align="center"
               variant="outlined"
               size="medium"
               color="secondary"
               className={classes.okButton}
-              onClick={okButtonClick}
+              onClick={addButtonClick}
+              startIcon={<AddIcon />}
             >
               ADD
             </Button>
-          </Grid>
-          <Grid align="center">
             <Button
+              align="center"
               variant="outlined"
               size="medium"
               color="secondary"
+              disabled={saveBtnDisabled}
               className={classes.okButton}
               onClick={saveButtonClick}
+              startIcon={<SaveIcon />}
             >
               SAVE
             </Button>
@@ -262,7 +298,7 @@ export default function FamilyDetail() {
       </Container>
       <Grid container>
         <Paper elevation={3}>
-          <DetailGrid data={rowData} edit = {editData} delete = {deleteData}/>
+          <DetailGrid data={rowData} edit={editData} delete={deleteData} />
         </Paper>
       </Grid>
     </div>
