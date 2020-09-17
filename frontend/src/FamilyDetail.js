@@ -31,10 +31,10 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(3),
   },
   fieldSpace: {
-    padding: "16px 8px 16px 8px",
+    padding: "0px 8px 10px 8px",
   },
   searchSpace: {
-    padding: "16px 8px 0px 8px",
+    padding: "24px 24px 0px 24px",
   },
   okButton: {
     color: "#181d1f",
@@ -139,7 +139,7 @@ export default function FamilyDetail() {
       </Container>
       <Container fixed={true} maxWidth={"md"} className={classes.container}>
         <Paper elevation={2}>
-          <Typography variant="h6" align="center">
+          <Typography variant="h5" align="center">
             Apartment Details
           </Typography>
           <Grid container>
@@ -206,7 +206,7 @@ export default function FamilyDetail() {
             </Grid>
           </Grid>
           <br />
-          <Typography variant="h6" align="center">
+          <Typography variant="h5" align="center">
             Family Details
           </Typography>
           <Grid container>

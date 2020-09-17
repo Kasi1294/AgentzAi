@@ -1,5 +1,4 @@
 import React from 'react';
-import './App.css';
 import FamilyDetail from './FamilyDetail.js'
 function App() {
   return (
