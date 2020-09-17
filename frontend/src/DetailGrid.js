@@ -33,12 +33,12 @@ const DetailGrid = (props) => {
   }
 
   const onSelectionChanged = () => {
-    let selectedRow = gridApi.getSelectedRows();
+    //let selectedRow = gridApi.getSelectedRows();
     //console.log(selectedRow)
   };
 
   const onRowSelected = () => {
-    let selectedRow = gridApi.getSelectedRows();
+    //let selectedRow = gridApi.getSelectedRows();
     //console.log(selectedRow)
   };
 
