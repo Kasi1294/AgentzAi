@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
   multiSelect:{
     minWidth: 201
   },
-  appartmentNumber:{
+  apartmentNumber:{
     minWidth: 201
   }
 }));
@@ -183,7 +183,7 @@ export default function FamilyDetail() {
                 onChange={(value) => setBlock(value.target.value)}
               />
             </Grid>
-            <Grid item sm={3} className={classes.fieldSpace + " " + classes.appartmentNumber}>
+            <Grid item sm={3} className={classes.fieldSpace + " " + classes.apartmentNumber}>
               <TextField
                 fullWidth
                 type="number"
