@@ -12,6 +12,8 @@ import Paper from "@material-ui/core/Paper";
 import "./FamilyDetails.css";
 import DetailGrid from "./DetailGrid";
 import Button from "@material-ui/core/Button";
+import AddIcon from '@material-ui/icons/Add';
+import SaveIcon from '@material-ui/icons/Save';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,6 +56,7 @@ export default function FamilyDetail() {
   const [gender, setGender] = React.useState("");
   const [relationshipToHead, setRelationshipToHead] = React.useState("");
   const [rowData, setRowData] = React.useState("");
+  const [saveBtnDisabled, setSaveBtnDisabled] = React.useState(true)
   
   
 
@@ -65,7 +68,7 @@ export default function FamilyDetail() {
     setRelationshipToHead(event.target.value);
   };
 
-  async function saveButtonClick(){
+  function saveButtonClick(){
     const url = "http://127.0.0.1:8000/home";
     const payLoad = { 
       method: 'post',
@@ -77,10 +80,14 @@ export default function FamilyDetail() {
     }
     
       fetch(url, payLoad)
-        .then(response => {console.log(response)});
+      .then(response => response.text())
+      .then(data => {
+        console.log(data)
+        setSaveBtnDisabled(true)
+      })
   }
 
-  const okButtonClick = () => {
+  const addButtonClick = () => {
     let gridData = {};
     gridData.familyName = familyName;
     gridData.phoneNumber = phoneNumber;
@@ -92,8 +99,20 @@ export default function FamilyDetail() {
     gridData.gender = gender;
     gridData.relationshipToHead = relationshipToHead;
     setRowData([gridData, ...rowData]);
+    setInitialState();
+    setSaveBtnDisabled(false)
   };
 
+  function setInitialState(){
+    setFamilyName("");
+    setPhoneNumber("");
+    setBlock("");
+    setApartmentNumber("");
+    setName("");
+    setAge("");
+    setGender("");
+    setRelationshipToHead("");
+  }
 
   const deleteData = rowIndex => {
     rowData.splice(rowIndex, 1)
@@ -172,6 +191,7 @@ export default function FamilyDetail() {
               />
             </Grid>
           </Grid>
+          <br/>
           <Typography variant="h6" align="center">
             Family Details
           </Typography>
@@ -235,24 +255,27 @@ export default function FamilyDetail() {
               </FormControl>
             </Grid>
           </Grid>
-          <Grid align="center">
+          <Grid item className={classes.fieldSpace} align="center">
             <Button
+              align="center"
               variant="outlined"
               size="medium"
               color="secondary"
               className={classes.okButton}
-              onClick={okButtonClick}
+              onClick={addButtonClick}
+              startIcon={<AddIcon />}
             >
               ADD
             </Button>
-          </Grid>
-          <Grid align="center">
             <Button
+              align="center"
               variant="outlined"
               size="medium"
               color="secondary"
+              disabled={saveBtnDisabled}
               className={classes.okButton}
               onClick={saveButtonClick}
+              startIcon={<SaveIcon />}
             >
               SAVE
             </Button>
