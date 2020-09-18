@@ -1,132 +1,57 @@
-import React, { useState } from "react";
-import { AgGridReact, AgGridColumn } from "ag-grid-react";
-import IconButton from '@material-ui/core/IconButton';
-import EditIcon from '@material-ui/icons/Edit';
-import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
-import "ag-grid-community/dist/styles/ag-grid.css";
-import "ag-grid-community/dist/styles/ag-theme-alpine.css";
+import React from "react";
+import MaterialTable from "material-table";
 
-const ChildMessageRenderer = (props) => {
-  const onDelete = () => {
-    props.context.onDelete(props);
-  };
-  const onEdit = () => {
-    props.context.onEdit(props);
-  };
-  return (
-    <span>
-      <IconButton color="primary" aria-label="upload picture" component="span">
-        <EditIcon onClick={onEdit}/>
-      </IconButton>
-      <IconButton color="primary" aria-label="upload picture" component="span">
-        <DeleteOutlineIcon onClick={onDelete}/>
-      </IconButton>
-    </span>
-  );
-};
+export default function DetailGrid(props) {
+  const columns = [
+    { title: "Family Name", field: "familyName" },
+    { title: "Phone Number", field: "phoneNumber" },
+    { title: "Apartment Detail", field: "apartmentDetail" },
+    { title: "Name", field: "name" },
+    { title: "Age", field: "age" },
+    { title: "Gender", field: "gender" },
+    { title: "Relationship To Head", field: "relationshipToHead" },
+  ];
 
-const DetailGrid = (props) => {
-  const [gridApi, setGridApi] = useState({});  
+  const dataFromParent = props.data;
+  const [rowData, setRowData] = React.useState(dataFromParent);
 
-  function onGridReady(params) {
-    setGridApi(params.api);
-  }
-
-  const onSelectionChanged = () => {
-    //let selectedRow = gridApi.getSelectedRows();
-    //console.log(selectedRow)
-  };
-
-  const onRowSelected = () => {
-    //let selectedRow = gridApi.getSelectedRows();
-    //console.log(selectedRow)
-  };
-
-  const onDelete = (gird) => {
-    let gridApi = gird.api;
-    let selectedRow = gridApi.getSelectedRows();
-    let rowIndex = gird.rowIndex;
-    props.delete(rowIndex);
-    gridApi.applyTransaction({ remove: selectedRow });
-  };
-
-  const onEdit = (gird) => {
-    let gridApi = gird.api;
-    let selectedRow = gridApi.getSelectedRows();
-    let rowIndex = gird.rowIndex;
-    props.edit(rowIndex, selectedRow);
-    console.log(selectedRow)
-  };
+  React.useEffect(() => {
+    setRowData(dataFromParent);
+  }, [dataFromParent]);
 
   return (
-    <div
-      id="myGrid"
-      style={{
-        position: "absolute",
-        height: "48%",
-        width: "90%",
-        left: "30px",
+    <MaterialTable
+      options={{
+        search: false,
+        actionsColumnIndex: -1
       }}
-      className="ag-theme-alpine"
-    >
-      <AgGridReact
-        defaultColDef={{
-          width: 180,
-          editable: false,
-          filter: "agTextColumnFilter",
-          floatingFilter: true,
-          resizable: true,
-        }}
-        rowSelection={"single"}
-        onGridReady={onGridReady}
-        onSelectionChanged={onSelectionChanged}
-        onRowSelected={onRowSelected}
-        columnTypes={{
-          numberColumn: {
-            width: 150,
-          },
-          type: "numericColumn",
-        }}
-        rowData={props.data}
-        context={{
-          onDelete,
-          onEdit
-        }}
-        frameworkComponents={{
-          childMessageRenderer: ChildMessageRenderer,
-        }}
-      >
-        <AgGridColumn
-          headerName="Family Name"
-          field="familyName"
-        ></AgGridColumn>
-        <AgGridColumn
-          headerName="Phone Number"
-          field="phoneNumber"
-          type="numberColumn"
-        ></AgGridColumn>
-        <AgGridColumn
-          headerName="Apartment Detail"
-          field="apartmentDetail"
-        ></AgGridColumn>
-        <AgGridColumn headerName="Name" field="name"></AgGridColumn>
-        <AgGridColumn
-          headerName="Age"
-          type="numberColumn"
-          field="age"
-        ></AgGridColumn>
-        <AgGridColumn headerName="Gender" field="gender"></AgGridColumn>
-        <AgGridColumn
-          headerName="Relation Ship To Head"
-          field="relationshipToHead"
-        ></AgGridColumn>
-        <AgGridColumn
-          field="value"
-          cellRenderer="childMessageRenderer"
-          colId="params"
-        />
-      </AgGridReact>
-    </div>
+      title="DETAILS"
+      columns={columns}
+      data={rowData}
+      actions={[
+        {
+          icon: 'edit',
+          tooltip: 'edit',
+          onClick: (event, rowData) => {
+            new Promise((resolve, reject) => {
+              const index = rowData.tableData.id;
+              props.edit(index, rowData)
+            }).then(Promise.resolve())
+          }
+        }
+      ]}
+      editable={{
+        onRowDelete: (oldData) =>
+          new Promise((resolve, reject) => {
+            setTimeout(() => {
+              const dataDelete = [...rowData];
+              const index = oldData.tableData.id;
+              dataDelete.splice(index, 1);
+              setRowData([...dataDelete]);
+              resolve();
+            }, 1000);
+          }),
+      }}
+    />
   );
-};
-export default DetailGrid;
+}

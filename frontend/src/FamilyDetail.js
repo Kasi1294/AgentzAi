@@ -9,12 +9,12 @@ import InputLabel from "@material-ui/core/InputLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Paper from "@material-ui/core/Paper";
-import "./FamilyDetails.css";
-import DetailGrid from "./DetailGrid";
 import SearchDetail from "./SearchDetail";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
 import SaveIcon from "@material-ui/icons/Save";
+import "./FamilyDetails.css";
+import DetailGrid from "./DetailGrid";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -47,12 +47,12 @@ const useStyles = makeStyles((theme) => ({
       border: "red solid 2px",
     },
   },
-  multiSelect:{
-    minWidth: 201
+  multiSelect: {
+    minWidth: 201,
   },
-  apartmentNumber:{
-    minWidth: 201
-  }
+  apartmentNumber: {
+    minWidth: 201,
+  },
 }));
 
 export default function FamilyDetail() {
@@ -65,9 +65,9 @@ export default function FamilyDetail() {
   const [age, setAge] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [relationshipToHead, setRelationshipToHead] = React.useState("");
-  const [rowData, setRowData] = React.useState("");
+  const [rowData, setRowData] = React.useState([]);
   const [saveBtnDisabled, setSaveBtnDisabled] = React.useState(true);
-
+  
   const genderChange = (event) => {
     setGender(event.target.value);
   };
@@ -122,14 +122,32 @@ export default function FamilyDetail() {
     setRelationshipToHead("");
   }
 
-  const deleteData = (rowIndex) => {
+  let deleteData = (rowIndex) => {
     rowData.splice(rowIndex, 1);
     setRowData([...rowData]);
   };
 
-  const editData = (rowIndex, updatedData) =>
-    setRowData((rowData[rowIndex] = updatedData));
+  let editData = (rowIndex, selectedData) => {
+    console.log(rowIndex);
+    console.log(selectedData);
+    console.log("rowData", rowData);
+    new Promise((resolve, reject) => {
+      setEditData(selectedData);
+      return resolve()
+    })
+  };
 
+  const setEditData = (selectedData) =>{
+      setAge(selectedData.age)
+      setBlock(selectedData.apartmentDetail)
+      setApartmentNumber(selectedData.apartmentNumber)
+      setBlock(selectedData.block)
+      setFamilyName(selectedData.familyName)
+      setGender(selectedData.gender)
+      setName(selectedData.name)
+      setPhoneNumber(selectedData.phoneNumber)
+      setRelationshipToHead(selectedData.relationshipToHead)
+  }
   return (
     <div>
       <Container fixed={true} maxWidth={"md"} className={classes.searchSpace}>
@@ -183,7 +201,11 @@ export default function FamilyDetail() {
                 onChange={(value) => setBlock(value.target.value)}
               />
             </Grid>
-            <Grid item sm={3} className={classes.fieldSpace + " " + classes.apartmentNumber}>
+            <Grid
+              item
+              sm={3}
+              className={classes.fieldSpace + " " + classes.apartmentNumber}
+            >
               <TextField
                 fullWidth
                 type="number"
@@ -296,9 +318,9 @@ export default function FamilyDetail() {
           </Grid>
         </Paper>
       </Container>
-      <Grid container>
-        <Paper elevation={3}>
-          <DetailGrid data={rowData} edit={editData} delete={deleteData} />
+      <Grid item className={classes.fieldSpace}>
+        <Paper elevation={3} >
+          <DetailGrid data={rowData} edit={editData}/>
         </Paper>
       </Grid>
     </div>
