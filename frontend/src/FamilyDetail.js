@@ -12,6 +12,8 @@ import Paper from "@material-ui/core/Paper";
 import SearchDetail from "./SearchDetail";
 import Button from "@material-ui/core/Button";
 import AddIcon from "@material-ui/icons/Add";
+import EditIcon from "@material-ui/icons/Edit";
+import DeleteIcon from "@material-ui/icons/Delete";
 import SaveIcon from "@material-ui/icons/Save";
 import "./FamilyDetails.css";
 import DetailGrid from "./DetailGrid";
@@ -67,7 +69,13 @@ export default function FamilyDetail() {
   const [relationshipToHead, setRelationshipToHead] = React.useState("");
   const [rowData, setRowData] = React.useState([]);
   const [saveBtnDisabled, setSaveBtnDisabled] = React.useState(true);
-  
+  const [mode, setMode] = React.useState({
+    isEdit: false,
+    isDelete: false,
+    index: null,
+    rowData: null,
+  });
+
   const genderChange = (event) => {
     setGender(event.target.value);
   };
@@ -106,7 +114,15 @@ export default function FamilyDetail() {
     gridData.age = age;
     gridData.gender = gender;
     gridData.relationshipToHead = relationshipToHead;
-    setRowData([gridData, ...rowData]);
+    if (!mode.isEdit && !mode.isDelete) {
+      setRowData([gridData, ...rowData]);
+    } else if (mode.isEdit) {
+      rowData[mode.index] = gridData;
+      setRowData([...rowData]);
+    } else {
+      rowData.splice(mode.index, 1);
+      setRowData([...rowData]);
+    }
     setInitialState();
     setSaveBtnDisabled(false);
   };
@@ -122,32 +138,43 @@ export default function FamilyDetail() {
     setRelationshipToHead("");
   }
 
-  let deleteData = (rowIndex) => {
-    rowData.splice(rowIndex, 1);
-    setRowData([...rowData]);
+  let deleteData = (rowIndex, selectedData) => {
+    new Promise((resolve, reject) => {
+      setMode({
+        isEdit: false,
+        isDelete: true,
+        index: rowIndex,
+        rowData: selectedData,
+      });
+      setData(selectedData);
+      return resolve();
+    });
   };
 
   let editData = (rowIndex, selectedData) => {
-    console.log(rowIndex);
-    console.log(selectedData);
-    console.log("rowData", rowData);
     new Promise((resolve, reject) => {
-      setEditData(selectedData);
-      return resolve()
-    })
+      setMode({
+        isEdit: true,
+        isDelete: false,
+        index: rowIndex,
+        rowData: selectedData,
+      });
+      setData(selectedData);
+      return resolve();
+    });
   };
 
-  const setEditData = (selectedData) =>{
-      setAge(selectedData.age)
-      setBlock(selectedData.apartmentDetail)
-      setApartmentNumber(selectedData.apartmentNumber)
-      setBlock(selectedData.block)
-      setFamilyName(selectedData.familyName)
-      setGender(selectedData.gender)
-      setName(selectedData.name)
-      setPhoneNumber(selectedData.phoneNumber)
-      setRelationshipToHead(selectedData.relationshipToHead)
-  }
+  const setData = (selectedData) => {
+    setAge(selectedData.age);
+    setBlock(selectedData.apartmentDetail);
+    setApartmentNumber(selectedData.apartmentNumber);
+    setBlock(selectedData.block);
+    setFamilyName(selectedData.familyName);
+    setGender(selectedData.gender);
+    setName(selectedData.name);
+    setPhoneNumber(selectedData.phoneNumber);
+    setRelationshipToHead(selectedData.relationshipToHead);
+  };
   return (
     <div>
       <Container fixed={true} maxWidth={"md"} className={classes.searchSpace}>
@@ -169,6 +196,7 @@ export default function FamilyDetail() {
                 name="familyName"
                 label="Family Name"
                 value={familyName}
+                disabled={mode.isDelete}
                 onChange={(value) => setFamilyName(value.target.value)}
               />
             </Grid>
@@ -186,6 +214,7 @@ export default function FamilyDetail() {
                 name="phoneNumber"
                 label="Phone Number"
                 value={phoneNumber}
+                disabled={mode.isDelete}
                 onChange={(value) => setPhoneNumber(value.target.value)}
               />
             </Grid>
@@ -198,6 +227,7 @@ export default function FamilyDetail() {
                 label="Block"
                 inputProps={{ maxLength: 1, pattern: "[A-Za-z]{1}" }}
                 value={block}
+                disabled={mode.isDelete}
                 onChange={(value) => setBlock(value.target.value)}
               />
             </Grid>
@@ -223,6 +253,7 @@ export default function FamilyDetail() {
                 name="apartmentNumber"
                 label="Apartment Number"
                 value={apartmentNumber}
+                disabled={mode.isDelete}
                 onChange={(value) => setApartmentNumber(value.target.value)}
               />
             </Grid>
@@ -239,6 +270,7 @@ export default function FamilyDetail() {
                 name="name"
                 label="Name"
                 value={name}
+                disabled = {mode.isDelete}
                 onChange={(value) => setName(value.target.value)}
               />
             </Grid>
@@ -256,6 +288,7 @@ export default function FamilyDetail() {
                 name="age"
                 label="Age"
                 value={age}
+                disabled = {mode.isDelete}
                 onChange={(value) => setAge(value.target.value)}
               />
             </Grid>
@@ -267,6 +300,7 @@ export default function FamilyDetail() {
                   id="genderSelect"
                   value={gender}
                   onChange={genderChange}
+                  disabled = {mode.isDelete}
                 >
                   <MenuItem value={"Male"}> Male </MenuItem>
                   <MenuItem value={"Female"}> Female </MenuItem>
@@ -281,6 +315,7 @@ export default function FamilyDetail() {
                   id="relationshipToHeadSelect"
                   value={relationshipToHead}
                   onChange={relationshipToHeadChange}
+                  disabled = {mode.isDelete}
                 >
                   <MenuItem value={"Head"}> Head </MenuItem>
                   <MenuItem value={"Wife"}> Wife </MenuItem>
@@ -299,9 +334,9 @@ export default function FamilyDetail() {
               color="secondary"
               className={classes.okButton}
               onClick={addButtonClick}
-              startIcon={<AddIcon />}
+              startIcon={mode.isEdit ? <EditIcon/> : mode.isDelete ? <DeleteIcon/> : <AddIcon/>}
             >
-              ADD
+              {mode.isEdit ? "EDIT" : mode.isDelete ? "DELETE" : "ADD"}
             </Button>
             <Button
               align="center"
@@ -319,8 +354,8 @@ export default function FamilyDetail() {
         </Paper>
       </Container>
       <Grid item className={classes.fieldSpace}>
-        <Paper elevation={3} >
-          <DetailGrid data={rowData} edit={editData}/>
+        <Paper elevation={3}>
+          <DetailGrid data={rowData} edit={editData} delete={deleteData} />
         </Paper>
       </Grid>
     </div>

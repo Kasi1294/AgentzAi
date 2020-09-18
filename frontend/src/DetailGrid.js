@@ -16,7 +16,7 @@ export default function DetailGrid(props) {
   const [rowData, setRowData] = React.useState(dataFromParent);
 
   React.useEffect(() => {
-    setRowData(dataFromParent);
+    setRowData([...dataFromParent]);
   }, [dataFromParent]);
 
   return (
@@ -31,27 +31,25 @@ export default function DetailGrid(props) {
       actions={[
         {
           icon: 'edit',
-          tooltip: 'edit',
+          tooltip: 'Edit',
           onClick: (event, rowData) => {
             new Promise((resolve, reject) => {
               const index = rowData.tableData.id;
               props.edit(index, rowData)
             }).then(Promise.resolve())
           }
+        },
+        {
+          icon: 'delete',
+          tooltip: 'Delete',
+          onClick: (event, rowData) => {
+            new Promise((resolve, reject) => {
+              const index = rowData.tableData.id;
+              props.delete(index, rowData)
+            }).then(Promise.resolve())
+          }
         }
       ]}
-      editable={{
-        onRowDelete: (oldData) =>
-          new Promise((resolve, reject) => {
-            setTimeout(() => {
-              const dataDelete = [...rowData];
-              const index = oldData.tableData.id;
-              dataDelete.splice(index, 1);
-              setRowData([...dataDelete]);
-              resolve();
-            }, 1000);
-          }),
-      }}
     />
   );
 }
